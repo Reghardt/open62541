@@ -2,7 +2,7 @@ use std::{ffi::CString, fmt, hash, str};
 
 use open62541_sys::{
     UA_NodeIdType, UA_NodeId_hash, UA_NodeId_parse, UA_NodeId_print, UA_NODEID_NULL,
-    UA_NODEID_NUMERIC, UA_NODEID_STRING_ALLOC,
+    UA_NODEID_NUMERIC, UA_NODEID_STRING_ALLOC, UA_NODEID_GUID, UA_Guid,
 };
 
 use crate::{ua, DataType, Error};
@@ -27,6 +27,19 @@ impl NodeId {
             inner.identifierType,
             UA_NodeIdType::UA_NODEIDTYPE_NUMERIC,
             "new node ID should have numeric type"
+        );
+
+        Self(inner)
+    }
+
+    /// Creates guid node ID.
+    #[must_use]
+    pub fn guid(ns_index: u16, guid: UA_Guid) -> Self {
+        let inner = unsafe { UA_NODEID_GUID(ns_index, guid) };
+        debug_assert_eq!(
+            inner.identifierType,
+            UA_NodeIdType::UA_NODEIDTYPE_GUID,
+            "new node ID should have guid type"
         );
 
         Self(inner)
